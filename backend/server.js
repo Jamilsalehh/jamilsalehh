@@ -8,6 +8,16 @@ const bodyParser = require('body-parser');
 // Initializing Express
 const app = express();
 
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
+// Routes
+app.get('/', (req, res) => {
+    res.send('GET - Home Page (Load homepage)');
+})
+
 // Creating the port and connecting to database.
 const PORT = process.env.PORT || 5000;
 mongoose.connect(process.env.MONGODB_URI).then(
