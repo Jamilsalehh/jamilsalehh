@@ -4,8 +4,10 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+
 // Importing Routes, Middleware, etc..
 const userRoute = require('./routes/userRoutes');
+const errorHandler = require('./middleware/errorMiddleware');
 
 // Initializing Express
 const app = express();
@@ -22,6 +24,9 @@ app.use('/api/users', userRoute);
 app.get('/', (req, res) => {
     res.send('GET - Home Page (Load homepage)');
 })
+
+// Calling the error handler middleware
+app.use(errorHandler);
 
 // Creating the port and connecting to database.
 const PORT = process.env.PORT || 5000;
