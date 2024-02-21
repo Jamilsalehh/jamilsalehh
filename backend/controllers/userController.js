@@ -1,5 +1,12 @@
 const asyncHandler = require("express-async-handler");
+const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
+
+const generateToken = (id) => {
+    return jwt.sign(
+        { id }, process.env.JWT_SECRET, { expiresIn: "1d" }
+    );
+}
 
 const registerUser = asyncHandler(async (req, res) => {
     const { name, email, password, birthdate, phone } = req.body;
@@ -19,7 +26,6 @@ const registerUser = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error("Email already exists, please try another one.");
     }
-
     // Creating the User in the Database
     const user = await User.create({
         name,
@@ -28,20 +34,21 @@ const registerUser = asyncHandler(async (req, res) => {
         birthdate,
         phone,
     });
-
+    // Generating the Token
+    const token = generateToken(user._id);
     if(user){
         res.status(201).json({
             _id: user._id,
             name: user.name,
             email: user.email,
             birthdate: user.birthdate,
-            phone: user.phone
+            phone: user.phone,
+            token
         });
     }else{
         res.status(400);
         throw new Error("Invalid user data.");
-    }
-    
+    } 
 });
 
 module.exports = {
