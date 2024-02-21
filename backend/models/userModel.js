@@ -12,7 +12,8 @@ const userSchema = new mongoose.Schema({
         trim: true,
         match: [
             /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-            "Please enter a valid email."]
+            "Please enter a valid email."
+        ]
     },
     password: {
         type: String,
@@ -21,7 +22,7 @@ const userSchema = new mongoose.Schema({
     },
     birthdate: {
         type: Date,
-        required: [true, "Please add your birthdate."],
+        required: [true, "Please add your birthdate."]
     },
     phone: {
         type: String,
@@ -30,15 +31,33 @@ const userSchema = new mongoose.Schema({
     paymentInfo: {
         cardNumber: {
             type: String,
-            required: [true, "Please add your card number."]
+            required: [false, "Please add your card number."],
+            validate: {
+                validator: function (v) {
+                    return /^\d{16}$/.test(v); 
+                },
+                message: props => `${props.value} is not a valid 16-digit card number!`
+            }
         },
         cvv: {
             type: String,
-            required: [true, "Please add your cvv."],
+            required: [false, "Please add your CVV."],
+            validate: {
+                validator: function (v) {
+                    return /^\d{3}$/.test(v); 
+                },
+                message: props => `${props.value} is not a valid CVV!`
+            }
         },
         expirationDate: {
             type: Date,
-            required: [true, "Please add your card's expiration date."],
+            required: [false, "Please add your card's expiration date."],
+            validate: {
+                validator: function (v) {
+                    return v > Date.now();
+                },
+                message: props => `${props.value} is not a valid expiration date!`
+            }
         }
     },
     subscribedToChatbot: {
