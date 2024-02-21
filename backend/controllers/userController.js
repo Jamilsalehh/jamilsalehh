@@ -19,6 +19,7 @@ const registerUser = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error("Email already exists, please try another one.");
     }
+
     // Creating the User in the Database
     const user = await User.create({
         name,
@@ -27,7 +28,7 @@ const registerUser = asyncHandler(async (req, res) => {
         birthdate,
         phone,
     });
-    
+
     if(user){
         res.status(201).json({
             _id: user._id,
