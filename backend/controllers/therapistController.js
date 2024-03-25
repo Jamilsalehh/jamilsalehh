@@ -1,120 +1,95 @@
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const crypto = require("crypto");
-const Token = require("../models/tokenModel");
-const sendEmail = require("../utils/sendEmail");
+const Therapist = require("../models/therapistModel");
 const Session = require("../models/sessionModel");
-const User = require("../models/userModel");
+const Token = require("../models/tokenModel");
+const crypto = require("crypto");
+const sendEmail = require('../utils/sendEmail'); 
 
+// Helper to generate JWT
 const generateToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "1d" });
 };
 
+// Register Therapist
 // TESTED
-const registerUser = asyncHandler(async (req, res) => {
-    const { name, email, password, birthdate, phone } = req.body;
-    // Checking for empty fields
-    if (!name || !email || !password || !birthdate || !phone ) {
+const register = asyncHandler(async (req, res) => {
+    const { name, email, password, qualifications, bio, availability } = req.body;
+
+    if (!name || !email || !password || !qualifications || !bio || !availability) {
         res.status(400);
-        throw new Error("Please fill in all the fields.");
+        throw new Error("Please fill in all required fields.");
     }
-    // Checking for password length
+
     if (password.length < 6) {
         res.status(400);
         throw new Error("Password should be at least 6 characters.");
     }
-    // Checking if email already exists in Database
-    const exists = await User.findOne({ email: email });
+
+    const exists = await Therapist.findOne({ email });
     if (exists) {
         res.status(400);
         throw new Error("Email already exists, please try another one.");
     }
-    // Creating the User in the Database
-    const user = await User.create({
+
+    const therapist = await Therapist.create({
         name,
         email,
-        password,
-        birthdate,
-        phone,
+        password, // This will be hashed in the model's pre-save middleware
+        qualifications,
+        bio,
+        availability
     });
-    // Generating the Token
-    const token = generateToken(user._id);
-    // Sending the HTTP-Only cookie to the frontend
-    res.cookie("token", token, {
-        path: "/",
-        httpOnly: true,
-        expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
-        sameSite: "none",
-        secure: true
+
+    const token = generateToken(therapist._id);
+
+    res.status(201).json({
+        _id: therapist._id,
+        name: therapist.name,
+        email: therapist.email,
+        token
     });
-    if(user){
-        res.status(201).json({
-            _id: user._id,
-            name: user.name,
-            email: user.email,
-            birthdate: user.birthdate,
-            phone: user.phone,
-            token
-        });
-    }else{
-        res.status(400);
-        throw new Error("Invalid user data.");
-    } 
 });
 // TESTED
-const loginUser = asyncHandler(async (req, res) => {
+const login = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
-    // Checking for empty fields
+
     if (!email || !password) {
         res.status(400);
-        throw new Error("Please fill in all the fields.");
+        throw new Error("Please fill in all fields.");
     }
-    // Checking if email exists in Database
-    const user = await User.findOne({ email: email });
-    if (!user) {
-        res.status(400);
-        throw new Error("User does not exist. \nPlease try a different email.");
-    }
-    // Checking if password is correct
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-        res.status(400);
-        throw new Error("Invalid Credentials. \nPlease try again");
-    }
-    // Generating the Token
-    const token = generateToken(user._id);
-    // Sending the HTTP-Only cookie to the frontend
-    res.cookie("token", token, {
-        path: "/",
-        httpOnly: true,
-        expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
-        sameSite: "none",
-        secure: true
-    });
-    if(user && isMatch){
-        res.status(201).json({
-            _id: user._id,
-            name: user.name,
-            email: user.email,
-            birthdate: user.birthdate,
-            phone: user.phone,
-            token
+
+    const therapist = await Therapist.findOne({ email });
+
+    if (therapist && (await bcrypt.compare(password, therapist.password))) {
+        res.cookie("token", generateToken(therapist._id), {
+            path: "/",
+            httpOnly: true,
+            expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // Example: 1 day
+            sameSite: "none", // Adjust based on your cross-site request needs
+            secure: true // Set to true if you're serving your site over HTTPS
+        }).status(201).json({
+            _id: therapist._id,
+            name: therapist.name,
+            email: therapist.email,
+            // Including the token in the JSON body is optional if it's already set as a cookie
         });
-    }else{
-        res.status(400);
-        throw new Error("Invalid  Credentials.");
-    } 
+        
+    } else {
+        res.status(401);
+        throw new Error("Invalid email or password");
+    }
 });
 // TESTED
 const logout = asyncHandler(async (req, res) => {
     if(req.cookies.token){
         res.cookie("token", "", { 
-            path: "/",
-            httpOnly: true,
-            expires: new Date(0),
-            sameSite: "none",
-            secure: true
+            expires: new Date(0), 
+            path: '/', 
+            httpOnly: true, 
+            sameSite: 'None', 
+            secure: true 
         });
         res.status(200).send("Logged out successfully.");
     }
@@ -124,19 +99,19 @@ const logout = asyncHandler(async (req, res) => {
 });
 // TESTED
 const getUser = asyncHandler(async (req, res) => {
-    const user = await User.findById(req.entity._id);
+    const user = await Therapist.findById(req.entity._id);
     if(user){
-        const { _id, name, email } = user;
+        const { _id, name, email, token } = user;
         res.status(201).json({
             _id,
             name,
-            email
+            email,
+            token
         });
     }
     else{
         res.status(400).send("User not found.");
     }
-
 });
 // TESTED
 const loginStatus = asyncHandler(async (req, res) => {
@@ -153,31 +128,28 @@ const loginStatus = asyncHandler(async (req, res) => {
     }
 });
 
-// User Data Manipulation
+// Profile Manipulation Methods.
 // TESTED
-const updateUser = asyncHandler(async (req, res) => {
-    const user = await User.findById(req.entity._id);
-    if(user){
-        const { name, email, birthdate} = user;
-        user.email = email;
-        user.name = req.body.name || name;
-        user.birthdate = req.body.birthdate || birthdate;
+const updateProfile = asyncHandler(async (req, res) => {
+    const therapist = await Therapist.findById(req.entity._id);
 
-        const updatedUser = await user.save();
-        return res.status(200).json({
-            _id: updatedUser._id,
-            name: updatedUser.name,
-            email: updatedUser.email,
-            birthdate: updatedUser.birthdate
-        });
+    if (!therapist) {
+        res.status(404);
+        throw new Error("Therapist not found");
     }
-    else{
-        res.status(400).send("User not found.");
-    }
+
+    const { name, qualifications, bio, availability } = req.body;
+    therapist.name = name || therapist.name;
+    therapist.qualifications = qualifications || therapist.qualifications;
+    therapist.bio = bio || therapist.bio;
+    therapist.availability = availability || therapist.availability;
+
+    const updatedTherapist = await therapist.save();
+    res.status(200).json(updatedTherapist);
 });
 // TESTED
 const changePassword = asyncHandler(async (req, res) => {
-    const user = await User.findById(req.entity._id);
+    const user = await Therapist.findById(req.entity._id);
     if (user) {
         const { oldPassword, newPassword } = req.body;
         if (!oldPassword || !newPassword) {
@@ -207,7 +179,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
     if (!email) {
         return res.status(400).json({ error: "Please fill in all fields." });
     }
-    const user = await User.findOne({ email: email });
+    const user = await Therapist.findOne({ email: email });
     if (!user) {
         return res.status(404).json({ error: "User not found." });
     }
@@ -279,7 +251,7 @@ const resetPassword = asyncHandler(async (req, res) => {
         return res.status(400).json({ error: "Invalid or expired token." });
     }
     // Checking if user exists.
-    const user = await User.findOne({ _id: userToken.userId });
+    const user = await Therapist.findOne({ _id: userToken.userId });
     if(!user){
         return res.status(404).json({ error: "User not found." });
     }
@@ -287,53 +259,103 @@ const resetPassword = asyncHandler(async (req, res) => {
     await user.save();
     res.status(200).json({ success: true, message: "Password reset successfully, please login." });
 });
-
-// Session Related Manipulation
-const bookSession = asyncHandler(async (req, res) => {
-    const { therapistId, sessionTime, notes } = req.body;
-    if (!therapistId || !sessionTime) {
-        res.status(400);
-        throw new Error("Please provide therapistId and sessionTime.");
+// TESTED
+const updateAvailability = asyncHandler(async (req, res) => {
+    const { availability } = req.body;
+    const therapistId = req.entity._id;
+    const therapist = await Therapist.findByIdAndUpdate(therapistId, { availability }, { new: true });
+    if (!therapist) {
+        return res.status(404).json({ message: "Therapist not found" });
     }
-    const session = new Session({
-        user: req.entity._id,
+    res.status(200).json({ message: "Availability updated successfully", availability: therapist.availability });
+});
+
+// Session Management.
+const createSession = asyncHandler(async (req, res) => {
+    const { user, sessionTime, notes } = req.body;
+    const therapistId = req.therapist._id; // Ensure this is populated from the token in middleware
+
+    if (!user || !sessionTime) {
+        return res.status(400).json({ message: "Missing required session details" });
+    }
+
+    const session = await Session.create({
         therapist: therapistId,
+        user,
         sessionTime,
         notes,
     });
-    await session.save();
+
     res.status(201).json(session);
 });
-const deleteSession = asyncHandler(async (req, res) => {
-    const { sessionId } = req.params;
-    const session = await Session.findById(sessionId);
+const updateSession = asyncHandler(async (req, res) => {
+    const { sessionTime, notes } = req.body;
+    const therapistId = req.therapist._id; // Ensure this is populated from the token in middleware
+    const sessionId = req.params.id;
+
+    if (!sessionTime) {
+        return res.status(400).json({ message: "Missing required session details" });
+    }
+
+    const session = await Session.findOneAndUpdate(
+        { _id: sessionId, therapist: therapistId },
+        { sessionTime, notes },
+        { new: true }
+    );
+
     if (!session) {
-        res.status(404);
-        throw new Error("Session not found.");
+        return res.status(404).json({ message: "Session not found" });
     }
-    if (session.user.toString() !== req.entity._id.toString()) {
-        res.status(401);
-        throw new Error("Not authorized to delete this session.");
-    }
-    await session.remove();
-    res.status(200).json({ message: "Session deleted successfully." });
+
+    res.status(200).json(session);
 });
-const viewSessions = asyncHandler(async (req, res) => {
-    const sessions = await Session.find({ user: req.entity._id }).populate('therapist', 'name');
+const deleteSession = asyncHandler(async (req, res) => {
+    const therapistId = req.therapist._id; // Ensure this is populated from the token in middleware
+    const sessionId = req.params.id;
+
+    const session = await Session.findOneAndDelete({ _id: sessionId, therapist: therapistId });
+
+    if (!session) {
+        return res.status(404).json({ message: "Session not found" });
+    }
+
+    res.status(200).json({ message: "Session deleted successfully" });
+});
+const getSession = asyncHandler(async (req, res) => {
+    const therapistId = req.therapist._id; // Ensure this is populated from the token in middleware
+    const sessionId = req.params.id;
+    const session = await Session.findOne({ _id: sessionId, therapist: therapistId });
+
+    if (!session) {
+        return res.status(404).json({ message: "Session not found" });
+    }
+
+    res.status(200).json(session);
+});
+const getSessions = asyncHandler(async (req, res) => {
+    const therapistId = req.therapist._id; // Ensure authentication middleware populates this
+
+    const sessions = await Session.find({ therapist: therapistId })
+                                   .populate('user', 'name email') // Adjust according to what you need
+                                   .sort({ sessionTime: 1 }); // Sorting by session time
+
     res.status(200).json(sessions);
 });
 
 module.exports = {
-    registerUser,
-    loginUser,
+    register,
+    login,
     logout,
     getUser,
     loginStatus,
-    updateUser,
+    updateProfile,
     changePassword,
     forgotPassword,
     resetPassword,
-    bookSession,
+    updateAvailability,
+    createSession,
+    updateSession,
     deleteSession,
-    viewSessions
+    getSession,
+    getSessions
 };

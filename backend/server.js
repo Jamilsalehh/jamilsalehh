@@ -8,6 +8,7 @@ const cookieParser = require('cookie-parser');
 
 // Importing Routes, Middleware, etc..
 const userRoute = require('./routes/userRoutes');
+const therapistRoute = require('./routes/therapistRoutes'); // Import therapist routes
 const errorHandler = require('./middleware/errorMiddleware');
 
 // Initializing Express
@@ -18,9 +19,11 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(cors());
 
 // Routes Middleware
 app.use('/api/users', userRoute);
+app.use('/api/therapists', therapistRoute); 
 
 // Routes
 app.get('/', (req, res) => {
