@@ -30,10 +30,10 @@ router.patch("/changepassword", protect, changePassword);
 router.post("/forgotpassword", forgotPassword);
 router.put("/resetpassword/:resetToken", resetPassword);
 router.patch('/updateavailability', protect, updateAvailability);
-router.post('/sessions', protect, createSession); 
+router.post('/createsession', protect, createSession); 
 router.get('/sessions', protect, getSessions); 
 router.get('/sessions/:sessionId', protect, getSession); 
-router.patch('/sessions/:sessionId', protect, updateSession); 
+router.patch('/updateSession/:sessionId', protect, updateSession); 
 router.delete('/sessions/:sessionId', protect, deleteSession); 
 
 module.exports = router;

@@ -72,8 +72,7 @@ const login = asyncHandler(async (req, res) => {
         }).status(201).json({
             _id: therapist._id,
             name: therapist.name,
-            email: therapist.email,
-            // Including the token in the JSON body is optional if it's already set as a cookie
+            email: therapist.email
         });
         
     } else {
@@ -271,9 +270,10 @@ const updateAvailability = asyncHandler(async (req, res) => {
 });
 
 // Session Management.
+// TESTED
 const createSession = asyncHandler(async (req, res) => {
     const { user, sessionTime, notes } = req.body;
-    const therapistId = req.therapist._id; // Ensure this is populated from the token in middleware
+    const therapistId = req.entity._id;
 
     if (!user || !sessionTime) {
         return res.status(400).json({ message: "Missing required session details" });
@@ -288,9 +288,10 @@ const createSession = asyncHandler(async (req, res) => {
 
     res.status(201).json(session);
 });
+// Update Session
 const updateSession = asyncHandler(async (req, res) => {
     const { sessionTime, notes } = req.body;
-    const therapistId = req.therapist._id; // Ensure this is populated from the token in middleware
+    const therapistId = req.entity._id; // Ensure this is populated from the token in middleware
     const sessionId = req.params.id;
 
     if (!sessionTime) {
@@ -309,8 +310,9 @@ const updateSession = asyncHandler(async (req, res) => {
 
     res.status(200).json(session);
 });
+// Delete Session
 const deleteSession = asyncHandler(async (req, res) => {
-    const therapistId = req.therapist._id; // Ensure this is populated from the token in middleware
+    const therapistId = req.entity._id;
     const sessionId = req.params.id;
 
     const session = await Session.findOneAndDelete({ _id: sessionId, therapist: therapistId });
@@ -321,8 +323,9 @@ const deleteSession = asyncHandler(async (req, res) => {
 
     res.status(200).json({ message: "Session deleted successfully" });
 });
+// Get Session
 const getSession = asyncHandler(async (req, res) => {
-    const therapistId = req.therapist._id; // Ensure this is populated from the token in middleware
+    const therapistId = req.entity._id;
     const sessionId = req.params.id;
     const session = await Session.findOne({ _id: sessionId, therapist: therapistId });
 
@@ -332,8 +335,10 @@ const getSession = asyncHandler(async (req, res) => {
 
     res.status(200).json(session);
 });
+
+// TESTED
 const getSessions = asyncHandler(async (req, res) => {
-    const therapistId = req.therapist._id; // Ensure authentication middleware populates this
+    const therapistId = req.entity._id; // Ensure authentication middleware populates this
 
     const sessions = await Session.find({ therapist: therapistId })
                                    .populate('user', 'name email') // Adjust according to what you need

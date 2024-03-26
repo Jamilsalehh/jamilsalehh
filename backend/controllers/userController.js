@@ -289,6 +289,7 @@ const resetPassword = asyncHandler(async (req, res) => {
 });
 
 // Session Related Manipulation
+// TESTED
 const bookSession = asyncHandler(async (req, res) => {
     const { therapistId, sessionTime, notes } = req.body;
     if (!therapistId || !sessionTime) {
@@ -304,24 +305,26 @@ const bookSession = asyncHandler(async (req, res) => {
     await session.save();
     res.status(201).json(session);
 });
+// TESTED
 const deleteSession = asyncHandler(async (req, res) => {
     const { sessionId } = req.params;
-    const session = await Session.findById(sessionId);
+    // Ensure the session belongs to the user before attempting to delete
+    const session = await Session.findOne({ _id: sessionId, user: req.entity._id });
     if (!session) {
-        res.status(404);
-        throw new Error("Session not found.");
+        return res.status(404).json({ message: "Session not found or not authorized to delete." });
     }
-    if (session.user.toString() !== req.entity._id.toString()) {
-        res.status(401);
-        throw new Error("Not authorized to delete this session.");
-    }
-    await session.remove();
+    // Use findByIdAndDelete for simplicity
+    await Session.findByIdAndDelete(sessionId);
     res.status(200).json({ message: "Session deleted successfully." });
 });
+// TESTED
 const viewSessions = asyncHandler(async (req, res) => {
-    const sessions = await Session.find({ user: req.entity._id }).populate('therapist', 'name');
+    // Filter sessions by the logged-in user's ID
+    const sessions = await Session.find({ user: req.entity._id })
+                                  .populate('therapist', 'name email');
     res.status(200).json(sessions);
 });
+
 
 module.exports = {
     registerUser,
