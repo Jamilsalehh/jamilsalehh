@@ -15,7 +15,7 @@ const generateToken = (id) => {
 // Register Therapist
 // TESTED
 const register = asyncHandler(async (req, res) => {
-    const { name, email, password, qualifications, bio, availability } = req.body;
+    const { name, email, password, qualifications, bio, availability, picture } = req.body;
 
     if (!name || !email || !password || !qualifications || !bio || !availability) {
         res.status(400);
@@ -39,7 +39,8 @@ const register = asyncHandler(async (req, res) => {
         password, // This will be hashed in the model's pre-save middleware
         qualifications,
         bio,
-        availability
+        availability,
+        picture
     });
 
     const token = generateToken(therapist._id);
@@ -173,6 +174,16 @@ const changePassword = asyncHandler(async (req, res) => {
         return res.status(404).json({ error: "User not found." });
     }
 });
+// TESTED
+const updateAvailability = asyncHandler(async (req, res) => {
+    const { availability } = req.body;
+    const therapistId = req.entity._id;
+    const therapist = await Therapist.findByIdAndUpdate(therapistId, { availability }, { new: true });
+    if (!therapist) {
+        return res.status(404).json({ message: "Therapist not found" });
+    }
+    res.status(200).json({ message: "Availability updated successfully", availability: therapist.availability });
+});
 const forgotPassword = asyncHandler(async (req, res) => {
     const { email } = req.body;
     if (!email) {
@@ -258,16 +269,6 @@ const resetPassword = asyncHandler(async (req, res) => {
     await user.save();
     res.status(200).json({ success: true, message: "Password reset successfully, please login." });
 });
-// TESTED
-const updateAvailability = asyncHandler(async (req, res) => {
-    const { availability } = req.body;
-    const therapistId = req.entity._id;
-    const therapist = await Therapist.findByIdAndUpdate(therapistId, { availability }, { new: true });
-    if (!therapist) {
-        return res.status(404).json({ message: "Therapist not found" });
-    }
-    res.status(200).json({ message: "Availability updated successfully", availability: therapist.availability });
-});
 
 // Session Management.
 // TESTED
@@ -288,7 +289,28 @@ const createSession = asyncHandler(async (req, res) => {
 
     res.status(201).json(session);
 });
-// Update Session
+// TESTED
+const getSessions = asyncHandler(async (req, res) => {
+    const therapistId = req.entity._id; // Ensure authentication middleware populates this
+
+    const sessions = await Session.find({ therapist: therapistId })
+                                   .populate('user', 'name email') // Adjust according to what you need
+                                   .sort({ sessionTime: 1 }); // Sorting by session time
+
+    res.status(200).json(sessions);
+});
+// TESTED
+const getSession = asyncHandler(async (req, res) => {
+    const therapistId = req.entity._id;
+    const sessionId = req.params.id;
+    const session = await Session.findOne({ _id: sessionId, therapist: therapistId });
+
+    if (!session) {
+        return res.status(404).json({ message: "Session not found" });
+    }
+
+    res.status(200).json(session);
+});
 const updateSession = asyncHandler(async (req, res) => {
     const { sessionTime, notes } = req.body;
     const therapistId = req.entity._id; // Ensure this is populated from the token in middleware
@@ -310,7 +332,6 @@ const updateSession = asyncHandler(async (req, res) => {
 
     res.status(200).json(session);
 });
-// Delete Session
 const deleteSession = asyncHandler(async (req, res) => {
     const therapistId = req.entity._id;
     const sessionId = req.params.id;
@@ -323,29 +344,8 @@ const deleteSession = asyncHandler(async (req, res) => {
 
     res.status(200).json({ message: "Session deleted successfully" });
 });
-// Get Session
-const getSession = asyncHandler(async (req, res) => {
-    const therapistId = req.entity._id;
-    const sessionId = req.params.id;
-    const session = await Session.findOne({ _id: sessionId, therapist: therapistId });
 
-    if (!session) {
-        return res.status(404).json({ message: "Session not found" });
-    }
 
-    res.status(200).json(session);
-});
-
-// TESTED
-const getSessions = asyncHandler(async (req, res) => {
-    const therapistId = req.entity._id; // Ensure authentication middleware populates this
-
-    const sessions = await Session.find({ therapist: therapistId })
-                                   .populate('user', 'name email') // Adjust according to what you need
-                                   .sort({ sessionTime: 1 }); // Sorting by session time
-
-    res.status(200).json(sessions);
-});
 
 module.exports = {
     register,

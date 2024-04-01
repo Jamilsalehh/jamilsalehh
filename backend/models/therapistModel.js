@@ -34,7 +34,11 @@ const therapistSchema = new mongoose.Schema({
     sessions: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Session'
-    }]
+    }],
+    picture: {
+        type: String,
+        required: false, 
+    }
 }, { timestamps: true });
 
 therapistSchema.pre("save", async function(next) {
