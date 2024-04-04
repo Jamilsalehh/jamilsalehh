@@ -15,9 +15,9 @@ const generateToken = (id) => {
 // Register Therapist
 // TESTED
 const register = asyncHandler(async (req, res) => {
-    const { name, email, password, qualifications, bio, availability, picture } = req.body;
+    const { name, email, password, qualifications, bio, picture } = req.body;
 
-    if (!name || !email || !password || !qualifications || !bio || !availability) {
+    if (!name || !email || !password || !qualifications || !bio ) {
         res.status(400);
         throw new Error("Please fill in all required fields.");
     }
@@ -39,7 +39,6 @@ const register = asyncHandler(async (req, res) => {
         password, // This will be hashed in the model's pre-save middleware
         qualifications,
         bio,
-        availability,
         picture
     });
 
@@ -101,11 +100,14 @@ const logout = asyncHandler(async (req, res) => {
 const getUser = asyncHandler(async (req, res) => {
     const user = await Therapist.findById(req.entity._id);
     if(user){
-        const { _id, name, email, token } = user;
+        const { _id, name, email,qualifications,bio,picture,token } = user;
         res.status(201).json({
             _id,
             name,
             email,
+            qualifications,
+            bio,
+            picture,
             token
         });
     }
@@ -138,11 +140,11 @@ const updateProfile = asyncHandler(async (req, res) => {
         throw new Error("Therapist not found");
     }
 
-    const { name, qualifications, bio, availability } = req.body;
+    const { name, qualifications, bio } = req.body;
     therapist.name = name || therapist.name;
     therapist.qualifications = qualifications || therapist.qualifications;
     therapist.bio = bio || therapist.bio;
-    therapist.availability = availability || therapist.availability;
+    // therapist.availability = availability || therapist.availability;
 
     const updatedTherapist = await therapist.save();
     res.status(200).json(updatedTherapist);

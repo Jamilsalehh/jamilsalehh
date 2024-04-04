@@ -13,7 +13,8 @@ const generateToken = (id) => {
 
 // TESTED
 const registerUser = asyncHandler(async (req, res) => {
-    const { name, email, password, birthdate, phone } = req.body;
+    console.log(req.body)
+    const { name, email, password, birthdate, phone,paymentInfo } = req.body;
     // Checking for empty fields
     if (!name || !email || !password || !birthdate || !phone ) {
         res.status(400);
@@ -37,6 +38,7 @@ const registerUser = asyncHandler(async (req, res) => {
         password,
         birthdate,
         phone,
+        paymentInfo,
     });
     // Generating the Token
     const token = generateToken(user._id);
@@ -55,6 +57,7 @@ const registerUser = asyncHandler(async (req, res) => {
             email: user.email,
             birthdate: user.birthdate,
             phone: user.phone,
+            paymentInfo:user.paymentInfo,
             token
         });
     }else{
@@ -99,6 +102,7 @@ const loginUser = asyncHandler(async (req, res) => {
             email: user.email,
             birthdate: user.birthdate,
             phone: user.phone,
+            paymentInfo:user.paymentInfo,
             token
         });
     }else{

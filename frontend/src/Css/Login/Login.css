@@ -2,16 +2,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
 
 .signup-login-wrapper{
-  height: 80%;
+  height: fit-content;
   box-sizing: border-box;
   padding: 20px;
   display: flex;
   justify-content: center;
   align-items: center;
+  transform: translateY(10%);
 }
 .container{
   position: relative;
-  max-width: 850px;
+  max-width: 1200px;
   width: 100%;
   background: #fff;
   padding: 40px 30px;
@@ -115,10 +116,48 @@
   height: 3px;
   width: 25px;
   background: #7d2ae8;
+  transition: width 1s ease;
 }
 .forms .signup-form  .title:before{
   width: 20px;
 }
+.minititle{
+  position: relative;
+  font-size: 20px;
+  font-weight: 500;
+  color: #333;
+}
+.forms .form-content .highlighted:before{
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 50px;
+  background: #7d2ae8;
+  transition: width 1s ease-in-out;
+}
+
+.forms .form-content .unhighlighted:before {
+  width: 0px; /* Width for unhighlighted state */
+}
+
+.unhighlighted{
+  opacity: 0.5;
+}
+.forms .form-content .unhighlighted:before{
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 0px;
+  width: 0px;
+  background: #7d2ae8;
+}
+.forms .signup-form  .unhighlighted:before{
+  width: 20px;
+}
+
 .forms .form-content .input-boxes{
   margin-top: 30px;
 }
@@ -194,6 +233,31 @@
 .container #flip{
   display: none;
 }
+
+.patient{
+  cursor: pointer;
+}
+.therapist{
+  cursor: pointer;
+}
+.bio-wrap {
+  position: relative;
+}
+
+.bio-wrapper {
+  position: relative;
+  height: 300px; /* Set the desired height for the parent div */
+}
+
+.bio {
+ height: 100%;
+ resize: none;
+ width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+}
+
+
 
 @media (max-width: 730px) {
   .container .cover{

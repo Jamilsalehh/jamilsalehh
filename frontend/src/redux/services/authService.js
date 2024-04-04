@@ -13,12 +13,27 @@ export const registerUser = async (user) => {
     try {
         const response = await axios.post(`${BACKEND_URL}/api/users/register`, user);
         if(response.statusText === "OK"){
-            toast.success("Registration Successful.");
+            console.log("Registration Successful.");
+            console.log(response);
         }
         return response.data;
     } catch (error) {
         const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
-        toast.error(message);
+        console.log(message);
+    }
+}
+
+export const registerTherapist = async (user) => {
+    try {
+        const response = await axios.post(`${BACKEND_URL}/api/therapists/register`, user);
+        if(response.statusText === "OK"){
+            console.log("Registration Successful.");
+            console.log(response);
+        }
+        return response.data;
+    } catch (error) {
+        const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
+        console.log(message);
     }
 }
 

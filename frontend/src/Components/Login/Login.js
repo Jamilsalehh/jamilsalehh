@@ -13,26 +13,78 @@ import "../../Css/Login/Login.css"
 import { store } from '../../redux/store'
 import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux'; // Import Provider and useDispatch
-import { validateEmail, loginUser,getLoginStatus} from '../../redux/services/authService'
+import { validateEmail, loginUser,getLoginStatus,registerUser,registerTherapist} from '../../redux/services/authService'
 import { SET_LOGIN, SET_NAME } from '../../redux/features/auth/authSlice';
 
-const initialState = {
+const initialLoginState = {
   email: "",
   password: ""
 }
 
+const initalUserSignUpState = {
+  userName: "",
+  userEmail: "",
+  userPassword: "",
+  userBirthDate: "",
+  userPhone: "",
+  paymentInfo : {
+    cardNumber: "",
+    cvv: "",
+    expirationDate: "",
+  }
+}
+
+const initalTherapistSignUpState = {
+  therapistName: "",
+  therapistEmail: "",
+  therapistPassword: "",
+  therapistBirthDate: "",
+  certifications: "",
+  bio:"",
+  picture:"",
+}
+
 function Login() {
 
-  // const [loginEmail,setLoginEmail] = useState("");
-  // const [loginPassword,setLoginPassword] = useState("");
+  // const [email,setemail] = useState("");
+  // const [password,setpassword] = useState("");
   const dispatch = useDispatch();
-  const [formData, setFormData] = useState(initialState);
+  const [loginFormData, setloginFormData] = useState(initialLoginState);
+  const [usersignupformData, setUserSignUpFormData] = useState(initalUserSignUpState);
+  const [therapistsignupformData, setTherapistSignUpFormData] = useState(initalTherapistSignUpState);
+  
+  const { email, password } = loginFormData;
+  const { userName,userEmail, userPassword, userBirthDate, userPhone,paymentInfo } = usersignupformData;
+  const { therapistName,therapistEmail,therapistPassword,therapistBirthDate,certifications,bio,picture } =  therapistsignupformData;
 
-  const { email, password } = formData;
-  const handleChange = (e) => {
+  const handleLoginChange = (e) => {
       const { name, value } = e.target;
-      setFormData({ ...formData, [name]: value});
+      setloginFormData({ ...loginFormData, [name]: value});
   }
+
+  const handleUserSignUpChange = (e) => {
+    const { name, value } = e.target;
+    if (name === "cardNumber" || name === "cvv" || name === "expirationDate") {
+      setUserSignUpFormData(prevState => ({
+        ...prevState,
+        paymentInfo: {
+          ...prevState.paymentInfo,
+          [name]: value
+        }
+      }));
+    } else {
+      setUserSignUpFormData(prevState => ({
+        ...prevState,
+        [name]: value
+      }));
+    }
+  }
+
+  const handleTherapistsSignUpChange = (e) => {
+    const { name, value } = e.target;
+    setTherapistSignUpFormData({ ...therapistsignupformData, [name]: value});
+}
+  
   const login = async (e) => {
     e.preventDefault();
     console.log("test");
@@ -59,7 +111,62 @@ function Login() {
     catch(error){
        console.log(error.message);
     }
+  }
+
+  const userRegister = async (e) => {
+    e.preventDefault();
+
+    if(!userName || !userEmail || !userPassword || !userBirthDate || !userPhone ){
+        return console.log("Please fill in all fields.");
+    }
+    if(userPassword.length < 6){
+        return console.log("Password must be at least 6 characters long.");
+    }
+
+    if(!validateEmail(userEmail)){
+        return console.log("Invalid email address.");
+    }
+
+    const userData = {name:userName,email:userEmail, password:userPassword ,birthdate:userBirthDate,phone:userPhone,paymentInfo:paymentInfo};
+    
+    try{
+        const data = await registerUser(userData);
+        await dispatch(SET_LOGIN(true));
+        await dispatch(SET_NAME(data.name));
+        console.log("Registration Successful.");
+    }
+    catch(error){
+        console.log(error.message);
+    }
 }
+
+const therapistRegister = async (e) => {
+  e.preventDefault();
+
+  if(!therapistName || !therapistEmail || !therapistPassword || !therapistBirthDate || !certifications || !bio ){
+      return console.log("Please fill in all fields.");
+  }
+  if(therapistPassword.length < 6){
+      return console.log("Password must be at least 6 characters long.");
+  }
+
+  if(!validateEmail(therapistEmail)){
+      return console.log("Invalid email address.");
+  }
+
+  const userData = {name:therapistName,email:therapistEmail, password:therapistPassword ,birthdate:therapistBirthDate,qualifications:certifications,bio:bio,picture:picture};
+  
+  try{
+      const data = await registerTherapist(userData);
+      await dispatch(SET_LOGIN(true));
+      await dispatch(SET_NAME(data.name));
+      console.log("Registration Successful.");
+  }
+  catch(error){
+      console.log(error.message);
+  }
+}
+
 useEffect(() => {
   const fetchData = async () => {
     try {
@@ -74,6 +181,18 @@ useEffect(() => {
   fetchData(); // Call the async function immediately
 
 }, []);
+
+const [userType, setUserType] = useState("patient");
+
+const handleUserTypeChange = (type) => {
+  setUserType(type);
+};
+
+useEffect(()=>{
+console.log(therapistsignupformData)
+},[therapistsignupformData])
+
+
   return (
     <div className="signup-login-wrapper">
     <div className="container" >
@@ -102,11 +221,11 @@ useEffect(() => {
                 <div className="input-boxes">
                   <div className="input-box">
                     <i className="fas fa-envelope"></i>
-                    <input type="email" placeholder="Enter your email" required name="email" value={ email } onChange={ handleChange } />
+                    <input type="email" placeholder="Enter your email" required name="email" value={ email } onChange={ handleLoginChange } />
                   </div>
                   <div className="input-box">
                     <i className="fas fa-lock"></i>
-                    <input type="password" placeholder="Enter your password" name="password" required value={ password } onChange={ handleChange } />
+                    <input type="password" placeholder="Enter your password" name="password" required value={ password } onChange={ handleLoginChange } />
                   </div>
                   <div className="text"><a href="#">Forgot password?</a></div>
                   <div className="button input-box">
@@ -116,29 +235,101 @@ useEffect(() => {
                 </div>
               </form>
             </div>
-            <div className="signup-form">
-              <div className="title">Signup</div>
-              <form action="#">
+            <div className="signup-form">       
+              <div className="title signup">Signup</div>
+              <br/>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: "10px" }}>
+                <div className={`minititle patient ${userType === "patient" ? "highlighted" : "unhighlighted"}`} onClick={() => handleUserTypeChange("patient")}>Patient</div>
+                <div className={`minititle therapist ${userType === "therapist" ? "highlighted" : "unhighlighted"}`} onClick={() => handleUserTypeChange("therapist")}>Therapist</div>
+              </div>
+
+              { userType === "patient" ? ( <form onSubmit={userRegister}>
                 <div className="input-boxes">
-                  <div className="input-box">
-                    <i className="fas fa-user"></i>
-                    <input type="text" placeholder="Enter your name" required />
+                <div className="row">
+                    <div className="col-md-6">
+                      <div className="input-box">
+                        <i className="fas fa-user"></i>
+                        <input type="text" className="form-control" placeholder="Enter your name" name="userName" value={userName} onChange={handleUserSignUpChange} required />
+                      </div>
+                      <div className="input-box">
+                        <i className="fas fa-envelope"></i>
+                        <input type="email" className="form-control" placeholder="Enter your email" name="userEmail" value={userEmail} onChange={handleUserSignUpChange} required />
+                      </div>
+                      <div className="input-box">
+                        <i className="fas fa-envelope"></i>
+                        <input type="password" className="form-control" placeholder="Enter your email" name="userPassword" value={userPassword} onChange={handleUserSignUpChange} required />
+                      </div>
+                      <div className="input-box">
+                        <i className="fas fa-lock"></i>
+                        <input type="date" className="form-control" name="userBirthDate" value={userBirthDate} onChange={handleUserSignUpChange} required />
+                      </div>
+                     
+                    </div>
+                    <div className="col-md-6">
+                      {/* <div className="title">Payment Info</div> */}
+                      <div className="input-box">
+                        <i className="fas fa-lock"></i>
+                        <input type="text" className="form-control" placeholder="xx/xxxxxx" name="userPhone" value={userPhone} onChange={handleUserSignUpChange}required />
+                      </div>
+                      <div className="input-box">
+                        <i className="fas fa-lock"></i>
+                        <input type="text" className="form-control" placeholder="xxxx-xxxx-xxxx-xxxx" name="cardNumber" value={paymentInfo.cardNumber} onChange={handleUserSignUpChange}  />
+                      </div>
+                      <div className="input-box">
+                        <i className="fas fa-lock"></i>
+                        <input type="text" className="form-control" placeholder="CVV" name="cvv" value={paymentInfo.cvv} onChange={handleUserSignUpChange}  />
+                      </div>
+                      <div className="input-box">
+                        <i className="fas fa-lock"></i>
+                        <input type="date" className="form-control" name="expirationDate" value={paymentInfo.expirationDate} onChange={handleUserSignUpChange} />
+                      </div>
+                    </div>
                   </div>
-                  <div className="input-box">
-                    <i className="fas fa-envelope"></i>
-                    <input type="text" placeholder="Enter your email" required />
+
+                  <div className="button input-box">
+                    <input type="submit" value="Submit" />
                   </div>
-                  <div className="input-box">
-                    <i className="fas fa-lock"></i>
-                    <input type="password" placeholder="Enter your password" required />
+                  <div className="text sign-up-text">Already have an account? <label htmlFor="flip">Login now</label></div>
+                </div>
+              </form> ) : (<form onSubmit={therapistRegister}>
+              <div className="input-boxes">
+                <div className="row">
+                    <div className="col-md-6">
+                      <div className="input-box">
+                        <i className="fas fa-user"></i>
+                        <input type="text" className="form-control" placeholder="Enter your name" name='therapistName' onChange={handleTherapistsSignUpChange} required />
+                      </div>
+                      <div className="input-box">
+                        <i className="fas fa-envelope"></i>
+                        <input type="email" className="form-control" placeholder="Enter your email" name='therapistEmail' onChange={handleTherapistsSignUpChange}required />
+                      </div>
+                      <div className="input-box">
+                        <i className="fas fa-envelope"></i>
+                        <input type="password" className="form-control" placeholder="Enter your password" name='therapistPassword' onChange={handleTherapistsSignUpChange}required />
+                      </div>
+                      <div className="input-box">
+                        <i className="fas fa-lock"></i>
+                        <input type="date" className="form-control" name='therapistBirthDate' onChange={handleTherapistsSignUpChange} required />
+                      </div>
+                      <div className="input-box">
+                        <i className="fas fa-lock"></i>
+                        <input type="text" className="form-control" name='certifications' onChange={handleTherapistsSignUpChange} placeholder="List of degrees, certifications, etc." required />
+                      </div>
+                    </div>
+                    <div className="col-md-6 bio-wrap">
+                      {/* <div className="title">Payment Info</div> */}
+                      <div className='bio-wrapper'> 
+                        <textarea className='bio' placeholder="Bio..." name='bio' onChange={handleTherapistsSignUpChange}  />
+                        </div>
+                    </div>
                   </div>
                   <div className="button input-box">
                     <input type="submit" value="Submit" />
                   </div>
                   <div className="text sign-up-text">Already have an account? <label htmlFor="flip">Login now</label></div>
                 </div>
-              </form>
-            </div>
+              </form>)}
+            </div> 
           </div>
         </div>
       </div>
