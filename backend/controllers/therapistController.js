@@ -15,7 +15,7 @@ const generateToken = (id) => {
 // Register Therapist
 // TESTED
 const register = asyncHandler(async (req, res) => {
-    const { name, email, password, qualifications, bio, picture } = req.body;
+    const { name, email, password, qualifications, bio, picture,availability } = req.body;
 
     if (!name || !email || !password || !qualifications || !bio ) {
         res.status(400);
@@ -39,7 +39,8 @@ const register = asyncHandler(async (req, res) => {
         password, // This will be hashed in the model's pre-save middleware
         qualifications,
         bio,
-        picture
+        picture,
+        availability
     });
 
     const token = generateToken(therapist._id);
@@ -72,7 +73,12 @@ const login = asyncHandler(async (req, res) => {
         }).status(201).json({
             _id: therapist._id,
             name: therapist.name,
-            email: therapist.email
+            email: therapist.email,
+            qualifications:therapist.qualifications,
+            bio:therapist.bio,
+            availability:therapist.availability,
+            sessions:therapist.sessions,
+            picture:therapist.picture,
         });
         
     } else {
@@ -100,7 +106,7 @@ const logout = asyncHandler(async (req, res) => {
 const getUser = asyncHandler(async (req, res) => {
     const user = await Therapist.findById(req.entity._id);
     if(user){
-        const { _id, name, email,qualifications,bio,picture,token } = user;
+        const { _id, name, email,qualifications,bio,picture,availability,token } = user;
         res.status(201).json({
             _id,
             name,
@@ -108,6 +114,7 @@ const getUser = asyncHandler(async (req, res) => {
             qualifications,
             bio,
             picture,
+            availability,
             token
         });
     }
@@ -144,7 +151,7 @@ const updateProfile = asyncHandler(async (req, res) => {
     therapist.name = name || therapist.name;
     therapist.qualifications = qualifications || therapist.qualifications;
     therapist.bio = bio || therapist.bio;
-    // therapist.availability = availability || therapist.availability;
+    therapist.availability = availability || therapist.availability;
 
     const updatedTherapist = await therapist.save();
     res.status(200).json(updatedTherapist);

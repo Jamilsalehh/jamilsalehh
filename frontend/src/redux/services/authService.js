@@ -50,12 +50,26 @@ export const loginUser = async (user) => {
     }
 }
 
+
 export const logoutUser = async (user) => {
     try {
         await axios.get(`${BACKEND_URL}/api/users/logout`);
     } catch (error) {
         const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
         toast.error(message);
+    }
+}
+
+export const loginTherapist = async (user) => {
+    try {
+        const response = await axios.post(`${BACKEND_URL}/api/therapists/login`, user);
+        if(response.status === 201){
+            console.log("Login Successful.");
+        }
+        return response.data;
+    } catch (error) {
+        const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
+        console.log(message);
     }
 }
 

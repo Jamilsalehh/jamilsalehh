@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState,useContext } from 'react';
 import {
   MDBBtn,
   MDBContainer,
@@ -13,8 +13,10 @@ import "../../Css/Login/Login.css"
 import { store } from '../../redux/store'
 import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux'; // Import Provider and useDispatch
-import { validateEmail, loginUser,getLoginStatus,registerUser,registerTherapist} from '../../redux/services/authService'
+import { validateEmail, loginUser,getLoginStatus,registerUser,registerTherapist,loginTherapist} from '../../redux/services/authService'
 import { SET_LOGIN, SET_NAME } from '../../redux/features/auth/authSlice';
+import UserContext from "../UserContext/UserContext";
+import isTherapistContext from '../UserContext/IsTherapist';
 
 const initialLoginState = {
   email: "",
@@ -41,11 +43,13 @@ const initalTherapistSignUpState = {
   therapistBirthDate: "",
   certifications: "",
   bio:"",
+  availability:[],
   picture:"",
 }
 
 function Login() {
-
+  const [user, setUser] = useContext(UserContext);
+  const [isTherapist,setIsTherapist] = useContext(isTherapistContext);
   // const [email,setemail] = useState("");
   // const [password,setpassword] = useState("");
   const dispatch = useDispatch();
@@ -53,10 +57,14 @@ function Login() {
   const [usersignupformData, setUserSignUpFormData] = useState(initalUserSignUpState);
   const [therapistsignupformData, setTherapistSignUpFormData] = useState(initalTherapistSignUpState);
   
+  
+  
   const { email, password } = loginFormData;
   const { userName,userEmail, userPassword, userBirthDate, userPhone,paymentInfo } = usersignupformData;
-  const { therapistName,therapistEmail,therapistPassword,therapistBirthDate,certifications,bio,picture } =  therapistsignupformData;
-
+  const { therapistName,therapistEmail,therapistPassword,therapistBirthDate,certifications,bio,availability,picture } =  therapistsignupformData;
+  useEffect(()=>{
+    console.log(user)
+  },[user])
   const handleLoginChange = (e) => {
       const { name, value } = e.target;
       setloginFormData({ ...loginFormData, [name]: value});
@@ -100,7 +108,16 @@ function Login() {
 
     const userData = { email, password };
     try{
-        const data = await loginUser(userData);
+        var data = await loginUser(userData);
+        if(!data){
+          console.log("in");
+          console.log(userData);
+          data = await loginTherapist(userData);
+          setIsTherapist(true);     
+        }else{
+          setIsTherapist(false);
+        }
+        setUser(data);
         await dispatch(SET_LOGIN(true));
         await dispatch(SET_NAME(data.name));
         // localStorage.setItem('authToken', data.token);
@@ -154,7 +171,7 @@ const therapistRegister = async (e) => {
       return console.log("Invalid email address.");
   }
 
-  const userData = {name:therapistName,email:therapistEmail, password:therapistPassword ,birthdate:therapistBirthDate,qualifications:certifications,bio:bio,picture:picture};
+  const userData = {name:therapistName,email:therapistEmail, password:therapistPassword ,birthdate:therapistBirthDate,qualifications:certifications,bio:bio,availability:availability,picture:picture};
   
   try{
       const data = await registerTherapist(userData);

@@ -26,10 +26,10 @@ const therapistSchema = new mongoose.Schema({
         type: String,
         required: [true, "Please add a bio."]
     },
-    // availability: {
-    //     type: [String], // This could be specific times or just days they are available
-    //     required: [false, "Please add your availability."]
-    // },
+    availability: {
+        type: [String], // This could be specific times or just days they are available
+        required: [false, "Please add your availability."]
+    },
     // Optional: Link to sessions if therapists have direct control over session management
     sessions: [{
         type: mongoose.Schema.Types.ObjectId,
