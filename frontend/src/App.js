@@ -5,6 +5,7 @@ import Login from "./Components/Login/Login";
 import UserContext from "./Components/UserContext/UserContext.js";
 import isTherapistContext from "./Components/UserContext/IsTherapist";
 import { useState } from "react";
+import UserHome from "./Components/Home/UserHome";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -14,7 +15,8 @@ function App() {
     <UserContext.Provider value={[user, setUser]}>
       <isTherapistContext.Provider value={[isTherapist,setIsTherapist]}>
         <NavBar />
-        <Login />
+        <UserHome />
+        {/* {!user && <Login />} */}
       </isTherapistContext.Provider>
     </UserContext.Provider>
      {/* <DarkThemeToggle /> */}

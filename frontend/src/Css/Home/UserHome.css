@@ -1,0 +1,91 @@
+
+.home-header{
+    border: 1px solid blue;
+    background-image: url('../../../public/Images/Therapists/Therapist2.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 70%;
+}
+
+.home-header-wrap-wrapper{
+    border: 1px solid red;
+    background-color: rgba(0, 0, 0, 0.5); /* Use rgba() to specify opacity */
+    height: 100%;
+}
+
+.home-header-wrapper{
+    border: 1px solid lime;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+    width: 50%;
+    box-sizing: border-box;
+    padding-left: 50px;
+    gap: 10px;
+    color: white;
+}
+
+.home-body{
+    border: 1px solid blue;
+    height:fit-content;
+    width: 100%;
+}
+
+.home-body-wrapper{
+    border: 1px solid red;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 40px;
+    gap: 15px;
+}
+.home-body-title{
+    border: 1px solid red;
+}
+.home-body-desc{
+    border: 1px solid lime;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    width: 70%;
+}
+.home-body-desc-left{
+    border: 1px solid blue;
+    flex-grow: 1;
+}
+.home-body-desc-right{
+    border: 1px solid red;
+    flex-grow: 1;
+}
+@media (max-width: 730px) {
+    .home-body-desc{
+        flex-direction: column;
+    }
+}
+.home-body-footer{
+    border: 1px solid red;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.home-body-faq{
+    border: 1px solid red;
+}
+.home-body-faq-wrapper{
+    border: 1px solid blue;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: fit-content;
+    box-sizing: border-box;
+    padding: 15px;
+    height: 100%;
+}
+.home-body-faq-accordion{
+    border: 1px solid red;
+    width: 60%;
+}
