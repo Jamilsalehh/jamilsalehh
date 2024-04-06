@@ -126,3 +126,13 @@ export const updateProfile = async (formData) => {
         toast.error(message);
     }
 }
+
+export const getAllTherapists = async () => {
+    try {
+        const response = await axios.get(`${BACKEND_URL}/api/users/therapists`);
+        return response.data;
+    } catch (error) {
+        const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
+        toast.error(message);
+    }
+}

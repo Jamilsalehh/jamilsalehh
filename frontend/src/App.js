@@ -15,8 +15,8 @@ function App() {
     <UserContext.Provider value={[user, setUser]}>
       <isTherapistContext.Provider value={[isTherapist,setIsTherapist]}>
         <NavBar />
-        <UserHome />
-        {/* {!user && <Login />} */}
+        {user && <UserHome />}
+        {!user && <Login />}
       </isTherapistContext.Provider>
     </UserContext.Provider>
      {/* <DarkThemeToggle /> */}
