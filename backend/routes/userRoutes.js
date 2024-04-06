@@ -13,7 +13,8 @@ const {
         resetPassword,
         bookSession,
         deleteSession,
-        viewSessions
+        viewSessions,
+        getAllTherapists
     } = require('../controllers/userController');
 
 router.post('/register', registerUser);
@@ -28,5 +29,5 @@ router.put("/resetpassword/:resetToken", resetPassword);
 router.post('/sessions', protect, bookSession);
 router.delete('/sessions/:sessionId', protect, deleteSession); 
 router.get('/sessions', protect, viewSessions);
-
+router.get('/therapists', protect, getAllTherapists);
 module.exports = router;

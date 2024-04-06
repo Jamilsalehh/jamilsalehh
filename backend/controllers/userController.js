@@ -6,7 +6,7 @@ const Token = require("../models/tokenModel");
 const sendEmail = require("../utils/sendEmail");
 const Session = require("../models/sessionModel");
 const User = require("../models/userModel");
-
+const Therapist = require("../models/therapistModel");
 const generateToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "1d" });
 };
@@ -293,6 +293,11 @@ const resetPassword = asyncHandler(async (req, res) => {
 });
 
 // Session Related Manipulation
+const getAllTherapists = asyncHandler(async (req, res) => {
+    const therapists = await Therapist.find({});
+    res.status(200).json(therapists);
+});
+
 // TESTED
 const bookSession = asyncHandler(async (req, res) => {
     const { therapistId, sessionTime, notes } = req.body;
@@ -330,6 +335,8 @@ const viewSessions = asyncHandler(async (req, res) => {
 });
 
 
+
+
 module.exports = {
     registerUser,
     loginUser,
@@ -342,5 +349,6 @@ module.exports = {
     resetPassword,
     bookSession,
     deleteSession,
-    viewSessions
+    viewSessions,
+    getAllTherapists
 };
