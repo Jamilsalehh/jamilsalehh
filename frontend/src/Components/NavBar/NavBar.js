@@ -1,10 +1,12 @@
 import { Avatar, Dropdown, Navbar } from "flowbite-react";
 import StartUpScreen from "../StartUpScreen/StartUpScreen";
-
+import { useNavigate } from 'react-router-dom'; 
 
 const NavBar = () => {
+  const navigate = useNavigate();
+
     return (<>  <Navbar fluid rounded>
-        <Navbar.Brand href="https://flowbite-react.com">
+        <Navbar.Brand onClick={()=>{navigate('/Home')}}>
           <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">Aaqlak</span>
         </Navbar.Brand>
         <div className="flex md:order-2">

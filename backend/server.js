@@ -19,7 +19,10 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:3000', // Allow requests from this origin
+    credentials: true, // Allow cookies to be sent from the frontend
+  }));
 
 // Routes Middleware
 app.use('/api/users', userRoute);

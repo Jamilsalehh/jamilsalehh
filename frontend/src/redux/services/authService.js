@@ -39,9 +39,13 @@ export const registerTherapist = async (user) => {
 
 export const loginUser = async (user) => {
     try {
-        const response = await axios.post(`${BACKEND_URL}/api/users/login`, user);
-        if(response.statusText === "OK"){
+        const response = await axios.post(`${BACKEND_URL}/api/users/login`, user, {
+            withCredentials: true, // Include credentials in the request
+            credentials: 'include' // Use credentials from the browser's cookie jar
+        });
+        if(response.status === 201){
             console.log("Login Successful.");
+            console.log(response)
         }
         return response.data;
     } catch (error) {
@@ -49,6 +53,7 @@ export const loginUser = async (user) => {
         console.log(message);
     }
 }
+
 
 
 export const logoutUser = async (user) => {
@@ -98,8 +103,11 @@ export const resetPassword = async (user, resetToken) => {
 
 export const getLoginStatus = async () => {
     try {
-        const response = await axios.get(`${BACKEND_URL}/api/users/loggedin`);
-        console.log(response.data);
+        const response = await axios.get(`${BACKEND_URL}/api/users/loggedin`,{
+            withCredentials: true, // Include credentials in the request
+            credentials: 'include' // Use credentials from the browser's cookie jar
+        });
+        console.log(response);
         return response.data;
     } catch (error) {
         const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
@@ -129,7 +137,11 @@ export const updateProfile = async (formData) => {
 
 export const getAllTherapists = async () => {
     try {
-        const response = await axios.get(`${BACKEND_URL}/api/users/therapists`);
+        const response = await axios.get(`${BACKEND_URL}/api/users/therapists`,{
+            withCredentials: true, // Include credentials in the request
+            credentials: 'include' // Use credentials from the browser's cookie jar
+        });
+        console.log(response.data);
         return response.data;
     } catch (error) {
         const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();

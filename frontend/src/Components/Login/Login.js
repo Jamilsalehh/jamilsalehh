@@ -17,6 +17,7 @@ import { validateEmail, loginUser,getLoginStatus,registerUser,registerTherapist,
 import { SET_LOGIN, SET_NAME } from '../../redux/features/auth/authSlice';
 import UserContext from "../UserContext/UserContext";
 import isTherapistContext from '../UserContext/IsTherapist';
+import { useNavigate } from 'react-router-dom'; 
 
 const initialLoginState = {
   email: "",
@@ -57,7 +58,7 @@ function Login() {
   const [usersignupformData, setUserSignUpFormData] = useState(initalUserSignUpState);
   const [therapistsignupformData, setTherapistSignUpFormData] = useState(initalTherapistSignUpState);
   
-  
+  const navigate = useNavigate();
   
   const { email, password } = loginFormData;
   const { userName,userEmail, userPassword, userBirthDate, userPhone,paymentInfo } = usersignupformData;
@@ -120,10 +121,8 @@ function Login() {
         setUser(data);
         await dispatch(SET_LOGIN(true));
         await dispatch(SET_NAME(data.name));
+        navigate('/Home');
         // localStorage.setItem('authToken', data.token);
-        const loginStatus = await getLoginStatus();
-        console.log(loginStatus);
-        console.log("Login Successful.");
     }
     catch(error){
        console.log(error.message);
@@ -184,20 +183,6 @@ const therapistRegister = async (e) => {
   }
 }
 
-useEffect(() => {
-  const fetchData = async () => {
-    try {
-      const loginStatus = await getLoginStatus();
-      console.log(loginStatus);
-    } catch (error) {
-      // Handle errors if needed
-      console.error(error);
-    }
-  };
-
-  fetchData(); // Call the async function immediately
-
-}, []);
 
 const [userType, setUserType] = useState("patient");
 

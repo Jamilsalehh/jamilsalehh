@@ -2,11 +2,13 @@ import { useEffect, useContext } from "react";
 import "../../Css/Home/UserHome.css";
 import Accordion from '../Accordion/Accordion'
 import Button from '@mui/material/Button';
-import { getAllTherapists } from "../../redux/services/authService";
+import { getAllTherapists, getLoginStatus } from "../../redux/services/authService";
 import UserContext from "../UserContext/UserContext";
+import { useNavigate } from 'react-router-dom'; 
 
 const UserHome = () => {
 	const [user, setUser] = useContext(UserContext);
+	const navigate = useNavigate();
 
     return ( <>
         <div className="home-header">
@@ -15,7 +17,7 @@ const UserHome = () => {
                     <div className="home-header-title"> <p> Lorem ipsum dolor sit amet.</p></div>
                     <div className="home-header-desc"> <p> Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ullam doloremque modi quisquam perferendis, voluptatibus nulla.</p></div>
                     <div className="home-header-button"> 
-						<Button variant="contained" onClick={getAllTherapists}> Get Therapists </Button>
+						<Button variant="contained" onClick={()=>{navigate('/AllTherapists')}}> Get Therapists </Button>
 					</div>
                 </div>
             </div>
@@ -24,6 +26,7 @@ const UserHome = () => {
             <div className="home-body-wrapper">
                 <div className="home-body-title"> 
                     <p> What our online therapists can help you with </p>
+					<button onClick={getLoginStatus}> test </button>
                 </div>
                 <div className="home-body-desc"> 
                     <div className="home-body-desc-left">

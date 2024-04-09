@@ -1,0 +1,47 @@
+.alltherapists_page_wrapper{
+    border: 1px solid blue;
+    height: fit-content;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    transform: translateY(10%);
+    width: 100%;
+}
+.alltherapists_page_wrap{
+    border: 1px solid rgb(12, 198, 255);
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 10px;
+}
+.alltherapists_wrapper{
+    border:1px solid red;
+    display: flex;
+    flex-wrap:wrap;
+    width: 70%;
+}
+.therapists_profile_wrapper{
+    border:1px solid blue;
+    padding: 20px;
+    flex-grow: 1;
+    min-width: 30%;
+}
+
+.therapists_bio_wrapper{
+    border: 1px solid pink;
+    flex-grow: 5;
+    min-width: 50%;
+}
+.therapists_availability_wrapper{
+    border:1px solid green;
+    display: flex;
+    gap: 10px;
+    flex-direction: column;
+    flex-grow: 1;
+    min-width: 20%;
+}
+.therapists_availability_dates{
+    background-color: rgba(0, 255, 255, 0.226);
+    cursor: pointer;
+    width: fit-content;
+}

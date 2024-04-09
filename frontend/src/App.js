@@ -6,6 +6,8 @@ import UserContext from "./Components/UserContext/UserContext.js";
 import isTherapistContext from "./Components/UserContext/IsTherapist";
 import { useState } from "react";
 import UserHome from "./Components/Home/UserHome";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+import AllTherapists from "./Components/AllTherapists/AllTherapists";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -14,9 +16,15 @@ function App() {
     <>
     <UserContext.Provider value={[user, setUser]}>
       <isTherapistContext.Provider value={[isTherapist,setIsTherapist]}>
-        <NavBar />
-        {user && <UserHome />}
-        {!user && <Login />}
+        
+        <BrowserRouter>
+        <Routes>    
+        <Route path="/" element={ <> <NavBar /> {!user && <Login />} </>}/>
+        {/* <Route path="/" element={!user && <Login />} /> */}
+        <Route path="/Home" element={<> <NavBar />{user && <UserHome />} </>} />     
+        <Route path="/AllTherapists" element={ <> <NavBar /> {<AllTherapists />} </>} />  
+        </Routes>
+        </BrowserRouter>
       </isTherapistContext.Provider>
     </UserContext.Provider>
      {/* <DarkThemeToggle /> */}
