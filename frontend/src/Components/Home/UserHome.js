@@ -2,12 +2,14 @@ import { useEffect, useContext } from "react";
 import "../../Css/Home/UserHome.css";
 import Accordion from '../Accordion/Accordion'
 import Button from '@mui/material/Button';
-import { getAllTherapists, getLoginStatus } from "../../redux/services/authService";
+import { getAllTherapists, getLoginStatus,getUser  } from "../../redux/services/authService";
 import UserContext from "../UserContext/UserContext";
 import { useNavigate } from 'react-router-dom'; 
+import isTherapistContext from "../UserContext/IsTherapist";
 
 const UserHome = () => {
 	const [user, setUser] = useContext(UserContext);
+	const [isTherapist,setIsTherapist] = useContext(isTherapistContext);
 	const navigate = useNavigate();
 
     return ( <>
@@ -17,7 +19,7 @@ const UserHome = () => {
                     <div className="home-header-title"> <p> Lorem ipsum dolor sit amet.</p></div>
                     <div className="home-header-desc"> <p> Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ullam doloremque modi quisquam perferendis, voluptatibus nulla.</p></div>
                     <div className="home-header-button"> 
-						<Button variant="contained" onClick={()=>{navigate('/AllTherapists')}}> Get Therapists </Button>
+						{!isTherapist && <Button variant="contained" onClick={()=>{navigate('/AllTherapists')}}> Get Therapists </Button>}
 					</div>
                 </div>
             </div>

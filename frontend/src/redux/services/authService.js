@@ -58,23 +58,13 @@ export const loginUser = async (user) => {
 
 export const logoutUser = async (user) => {
     try {
-        await axios.get(`${BACKEND_URL}/api/users/logout`);
+        await axios.get(`${BACKEND_URL}/api/users/logout`,{
+            withCredentials: true, // Include credentials in the request
+            credentials: 'include' // Use credentials from the browser's cookie jar
+        });
     } catch (error) {
         const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
         toast.error(message);
-    }
-}
-
-export const loginTherapist = async (user) => {
-    try {
-        const response = await axios.post(`${BACKEND_URL}/api/therapists/login`, user);
-        if(response.status === 201){
-            console.log("Login Successful.");
-        }
-        return response.data;
-    } catch (error) {
-        const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
-        console.log(message);
     }
 }
 
@@ -117,7 +107,10 @@ export const getLoginStatus = async () => {
 
 export const getUser = async () => {
     try {
-        const response = await axios.get(`${BACKEND_URL}/api/users/getUser`);
+        const response = await axios.get(`${BACKEND_URL}/api/users/getUser`,{
+            withCredentials: true, // Include credentials in the request
+            credentials: 'include' // Use credentials from the browser's cookie jar
+        });
         return response.data;
     } catch (error) {
         const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
@@ -142,6 +135,38 @@ export const getAllTherapists = async () => {
             credentials: 'include' // Use credentials from the browser's cookie jar
         });
         console.log(response.data);
+        return response.data;
+    } catch (error) {
+        const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
+        toast.error(message);
+    }
+}
+
+
+//Therapist
+
+export const loginTherapist = async (user) => {
+    try {
+        const response = await axios.post(`${BACKEND_URL}/api/therapists/login`, user,{
+            withCredentials: true, // Include credentials in the request
+            credentials: 'include' // Use credentials from the browser's cookie jar
+        });
+        if(response.status === 201){
+            console.log("Login Successful.");
+        }
+        return response.data;
+    } catch (error) {
+        const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
+        console.log(message);
+    }
+}
+
+export const getUserAsTherapist = async () => {
+    try {
+        const response = await axios.get(`${BACKEND_URL}/api/therapists/getuser`,{
+            withCredentials: true, // Include credentials in the request
+            credentials: 'include' // Use credentials from the browser's cookie jar
+        });
         return response.data;
     } catch (error) {
         const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();

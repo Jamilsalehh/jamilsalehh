@@ -131,11 +131,15 @@ const logout = asyncHandler(async (req, res) => {
 const getUser = asyncHandler(async (req, res) => {
   const user = await User.findById(req.entity._id);
   if (user) {
-    const { _id, name, email } = user;
+    const { _id, name, email,birthdate,phone,paymentInfo,subscribedToChatbot } = user;
     res.status(201).json({
       _id,
       name,
       email,
+      birthdate,
+      phone,
+      paymentInfo,
+      subscribedToChatbot,
     });
   } else {
     res.status(400).send("User not found.");

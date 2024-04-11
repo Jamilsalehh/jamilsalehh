@@ -1,15 +1,32 @@
 import { Avatar, Dropdown, Navbar } from "flowbite-react";
 import StartUpScreen from "../StartUpScreen/StartUpScreen";
 import { useNavigate } from 'react-router-dom'; 
+import { logoutUser } from "../../redux/services/authService";
+import React, { useEffect, useState,useContext } from 'react';
+import UserContext from "../UserContext/UserContext";
+import isTherapistContext from '../UserContext/IsTherapist';
 
-const NavBar = () => {
+const NavBar = ({user}) => {
+  const [userr, setUser] = useContext(UserContext);
+  const [isTherapist,setIsTherapist] = useContext(isTherapistContext);
   const navigate = useNavigate();
+
+  const logout = ()=>{
+    logoutUser();
+    setUser(null);
+    setIsTherapist(false);
+    navigate('/');
+  };
+
+  const viewSessions = () =>{
+    navigate('/UserSessions');
+  }
 
     return (<>  <Navbar fluid rounded>
         <Navbar.Brand onClick={()=>{navigate('/Home')}}>
           <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">Aaqlak</span>
         </Navbar.Brand>
-        <div className="flex md:order-2">
+        {user && <div className="flex md:order-2">
           <Dropdown
             arrowIcon={false}
             inline
@@ -18,17 +35,16 @@ const NavBar = () => {
             }
           >
             <Dropdown.Header>
-              <span className="block text-sm">Bonnie Green</span>
-              <span className="block truncate text-sm font-medium">name@flowbite.com</span>
+              <span className="block text-sm">{user.name}</span>
+              <span className="block truncate text-sm font-medium">{user.email}</span>
             </Dropdown.Header>
-            <Dropdown.Item>Dashboard</Dropdown.Item>
             <Dropdown.Item>Settings</Dropdown.Item>
-            <Dropdown.Item>Earnings</Dropdown.Item>
+            <Dropdown.Item onClick={viewSessions}>Sessions</Dropdown.Item>
             <Dropdown.Divider />
-            <Dropdown.Item>Sign out</Dropdown.Item>
+            <Dropdown.Item onClick={logout}>Sign out</Dropdown.Item>
           </Dropdown>
           <Navbar.Toggle />
-        </div>
+        </div>}
         <Navbar.Collapse>
           <Navbar.Link href="#" active>
             Home

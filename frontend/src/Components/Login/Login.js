@@ -13,7 +13,7 @@ import "../../Css/Login/Login.css"
 import { store } from '../../redux/store'
 import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux'; // Import Provider and useDispatch
-import { validateEmail, loginUser,getLoginStatus,registerUser,registerTherapist,loginTherapist} from '../../redux/services/authService'
+import { validateEmail, loginUser,getLoginStatus,registerUser,registerTherapist,loginTherapist,getUser, getUserAsTherapist} from '../../redux/services/authService'
 import { SET_LOGIN, SET_NAME } from '../../redux/features/auth/authSlice';
 import UserContext from "../UserContext/UserContext";
 import isTherapistContext from '../UserContext/IsTherapist';
@@ -63,9 +63,7 @@ function Login() {
   const { email, password } = loginFormData;
   const { userName,userEmail, userPassword, userBirthDate, userPhone,paymentInfo } = usersignupformData;
   const { therapistName,therapistEmail,therapistPassword,therapistBirthDate,certifications,bio,availability,picture } =  therapistsignupformData;
-  useEffect(()=>{
-    console.log(user)
-  },[user])
+
   const handleLoginChange = (e) => {
       const { name, value } = e.target;
       setloginFormData({ ...loginFormData, [name]: value});
@@ -191,9 +189,34 @@ const handleUserTypeChange = (type) => {
 };
 
 useEffect(()=>{
-console.log(therapistsignupformData)
-},[therapistsignupformData])
+  const fetchData = async () => {
+    try {
+        const user = await getUser(); // Await the result of the getUser function
+        if(user){
+          setUser(user);
+          setIsTherapist(false);
+          navigate('/Home');
+        }else{
+          try{
+            const user = await getUserAsTherapist();
+            if(user){
+              console.log(user)
+              setUser(user);
+              setIsTherapist(true);
+              navigate('/Home');
+            }
+          }catch(error){
+            console.log(error);
+          }
+        }
+    } catch (error) {
+        console.log(error);
+    }
+};
 
+fetchData(); // Call the fetchData function to fetch the user data
+  
+},[])
 
   return (
     <div className="signup-login-wrapper">
