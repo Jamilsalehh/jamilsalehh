@@ -18,6 +18,8 @@ import { SET_LOGIN, SET_NAME } from '../../redux/features/auth/authSlice';
 import UserContext from "../UserContext/UserContext";
 import isTherapistContext from '../UserContext/IsTherapist';
 import { useNavigate } from 'react-router-dom'; 
+import { IconButton } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const initialLoginState = {
   email: "",
@@ -168,7 +170,7 @@ const therapistRegister = async (e) => {
       return console.log("Invalid email address.");
   }
 
-  const userData = {name:therapistName,email:therapistEmail, password:therapistPassword ,birthdate:therapistBirthDate,qualifications:certifications,bio:bio,availability:availability,picture:picture};
+  const userData = {name:therapistName,email:therapistEmail, password:therapistPassword ,birthdate:therapistBirthDate,qualifications:certifications,bio:bio,availability:selectedSlots,picture:picture};
   
   try{
       const data = await registerTherapist(userData);
@@ -217,6 +219,37 @@ useEffect(()=>{
 fetchData(); // Call the fetchData function to fetch the user data
   
 },[])
+
+
+
+const [selectedDay, setSelectedDay] = useState(null);
+const [selectedSlot, setSelectedSlot] = useState(null);
+const [selectedSlots, setSelectedSlots] = useState([]);
+
+const toggleWeekhours = (day) => {
+  setSelectedDay(day === selectedDay ? null : day);
+};
+
+const selectSlot = (slot) => {
+  const newSlot = `${selectedDay} ${slot}`;
+  setSelectedSlots([...selectedSlots, newSlot]);
+  setSelectedSlot(null);
+};
+
+const removeSlot = (slot) => {
+  setSelectedSlots(selectedSlots.filter((s) => s !== slot));
+};
+
+const weekhourOptions = ['08:00 - 10:00', '10:00 - 12:00', '12:00 - 14:00', '14:00 - 16:00'];
+
+const filteredWeekhourOptions = selectedDay
+  ? weekhourOptions.filter((slot) => !selectedSlots.includes(`${selectedDay} ${slot}`))
+  : weekhourOptions;
+
+
+  useEffect(()=>{
+    console.log(selectedSlots)
+  },[selectedSlots])
 
   return (
     <div className="signup-login-wrapper">
@@ -348,6 +381,35 @@ fetchData(); // Call the fetchData function to fetch the user data
                         </div>
                     </div>
                   </div>
+                  <div className='availability-wrapper'>
+      <div className='weekday-availability-wrapper'>
+        {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map((day) => (
+          <div key={day} className={`weekdays ${selectedDay === day ? 'selected' : ''}`} onClick={() => toggleWeekhours(day)}>
+            {day}
+          </div>
+        ))}
+      </div>
+      <div className='weekhour-availability-wrapper' style={{ display: selectedDay ? 'block' : 'none' }}>
+        {filteredWeekhourOptions.map((slot) => (
+          <div key={slot} className='weekhours' onClick={() => selectSlot(slot)}>
+            {slot}
+          </div>
+        ))}
+      </div>
+      <div>
+        <h3>Selected Slots:</h3>
+        <ul>
+          {selectedSlots.map((slot, index) => (
+            <li key={index}>
+              {slot}{' '}
+              <IconButton onClick={() => removeSlot(slot)}>
+                <DeleteIcon />
+              </IconButton>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
                   <div className="button input-box">
                     <input type="submit" value="Submit" />
                   </div>
