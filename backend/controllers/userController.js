@@ -316,7 +316,6 @@ const getAllTherapists = asyncHandler(async (req, res) => {
   const therapists = await Therapist.find({});
   res.status(200).json(therapists);
 });
-
 // TESTED
 const bookSession = asyncHandler(async (req, res) => {
   const { therapistId, sessionTime, notes } = req.body;
@@ -359,6 +358,33 @@ const viewSessions = asyncHandler(async (req, res) => {
   );
   res.status(200).json(sessions);
 });
+// TESTED
+const getBookedTherapists = asyncHandler(async (req, res) => {
+  const userId = req.entity._id; 
+  const sessions = await Session.find({ user: userId }).populate('therapist', 'name email qualifications');
+  const therapists = sessions.map(session => ({
+      therapistId: session.therapist._id,
+      name: session.therapist.name,
+      email: session.therapist.email,
+      qualifications: session.therapist.qualifications
+  })).filter((value, index, self) =>
+      index === self.findIndex((t) => t.therapistId.toString() === value.therapistId.toString())
+  );
+
+  res.status(200).json(therapists);
+});
+// TESTED
+const getTherapist = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const therapist = await Therapist.findById(id).select("-password");
+  if (therapist) {
+    res.status(200).json(therapist);
+  } else {
+    res.status(404);
+    throw new Error("Therapist not found.");
+  }
+});
+
 
 module.exports = {
   registerUser,
@@ -374,4 +400,6 @@ module.exports = {
   deleteSession,
   viewSessions,
   getAllTherapists,
+  getBookedTherapists,
+  getTherapist
 };

@@ -14,7 +14,9 @@ const {
         bookSession,
         deleteSession,
         viewSessions,
-        getAllTherapists
+        getAllTherapists,
+        getBookedTherapists,
+        getTherapist
     } = require('../controllers/userController');
 
 router.post('/register', registerUser);
@@ -30,4 +32,6 @@ router.post('/sessions', protect, bookSession);
 router.delete('/sessions/:sessionId', protect, deleteSession); 
 router.get('/sessions', protect, viewSessions);
 router.get('/therapists', protect, getAllTherapists);
+router.get('/bookedtherapists', protect, getBookedTherapists);
+router.get('/therapists/:therapistId', protect, getTherapist);
 module.exports = router;

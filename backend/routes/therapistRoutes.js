@@ -16,7 +16,9 @@ const {
     updateSession,
     deleteSession,
     getSession,
-    getSessions
+    getSessions,
+    getClients,
+    getClient
 } = require('../controllers/therapistController');
 
 // Authentication and Profile Management
@@ -35,5 +37,7 @@ router.get('/sessions', protect, getSessions);
 router.get('/sessions/:sessionId', protect, getSession); 
 router.patch('/updateSession/:sessionId', protect, updateSession); 
 router.delete('/sessions/:sessionId', protect, deleteSession); 
+router.get('/clients', protect, getClients);
+router.get('/clients/:clientId', protect, getClient);
 
 module.exports = router;

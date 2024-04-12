@@ -353,11 +353,9 @@ const getSession = asyncHandler(async (req, res) => {
     _id: sessionId,
     therapist: therapistId,
   });
-
   if (!session) {
     return res.status(404).json({ message: "Session not found" });
   }
-
   res.status(200).json(session);
 });
 const updateSession = asyncHandler(async (req, res) => {
@@ -398,6 +396,28 @@ const deleteSession = asyncHandler(async (req, res) => {
 
   res.status(200).json({ message: "Session deleted successfully" });
 });
+const getClients = asyncHandler(async (req, res) => {
+  const therapistId = req.entity._id; 
+  const sessions = await Session.find({ therapist: therapistId }).populate('user', 'name email');
+  // Extracting unique clients
+  const clients = sessions.map(session => ({
+      clientId: session.user._id,
+      name: session.user.name,
+      email: session.user.email
+  })).filter((value, index, self) =>
+      index === self.findIndex((t) => t.clientId.toString() === value.clientId.toString())
+  );
+  res.status(200).json(clients);
+});
+const getClient = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const user = await User.findById(id).select("-password");
+  if (!user) {
+    return res.status(404).json({ message: "Client not found" });
+  } else{
+    res.status(200).json(user);
+  }
+});
 
 module.exports = {
   register,
@@ -415,4 +435,6 @@ module.exports = {
   deleteSession,
   getSession,
   getSessions,
+  getClients,
+  getClient
 };
