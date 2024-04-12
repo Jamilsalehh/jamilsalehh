@@ -119,8 +119,28 @@ export const getUser = async () => {
 }
 
 export const updateProfile = async (formData) => {
+    console.log(formData)
     try {
-        const response = await axios.patch(`${BACKEND_URL}/api/users/updateUser`, formData);
+        const response = await axios.patch(`${BACKEND_URL}/api/users/updateUser`, formData,{
+            withCredentials: true, // Include credentials in the request
+            credentials: 'include' // Use credentials from the browser's cookie jar
+        });
+        console.log(response);
+        return response.data;
+    } catch (error) {
+        const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
+        toast.error(message);
+    }
+}
+
+export const updateTherapist = async (formData) => {
+    console.log(formData)
+    try {
+        const response = await axios.patch(`${BACKEND_URL}/api/therapists/updateprofile`, formData,{
+            withCredentials: true, // Include credentials in the request
+            credentials: 'include' // Use credentials from the browser's cookie jar
+        });
+        console.log(response);
         return response.data;
     } catch (error) {
         const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();

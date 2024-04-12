@@ -167,10 +167,18 @@ const loginStatus = asyncHandler(async (req, res) => {
 const updateUser = asyncHandler(async (req, res) => {
   const user = await User.findById(req.entity._id);
   if (user) {
-    const { name, email, birthdate } = user;
+    const { name, email, birthdate,phone,paymentInfo } = user;
     user.email = email;
     user.name = req.body.name || name;
     user.birthdate = req.body.birthdate || birthdate;
+    user.phone = req.body.phone || phone;
+    user.paymentInfo = req.body.paymentInfo || paymentInfo;
+    console.log(req.body);
+    console.log(name);
+    console.log(email);
+    console.log(birthdate);
+    console.log(phone);
+    console.log(paymentInfo);
 
     const updatedUser = await user.save();
     return res.status(200).json({
@@ -178,6 +186,8 @@ const updateUser = asyncHandler(async (req, res) => {
       name: updatedUser.name,
       email: updatedUser.email,
       birthdate: updatedUser.birthdate,
+      phone:updateUser.phone,
+      paymentInfo:updateUser.paymentInfo,
     });
   } else {
     res.status(400).send("User not found.");

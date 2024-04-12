@@ -10,6 +10,7 @@ import { BrowserRouter, Route, Routes, Navigate, useNavigate } from "react-route
 import AllTherapists from "./Components/AllTherapists/AllTherapists";
 import { getLoginStatus, getUser, getUserAsTherapist} from "./redux/services/authService";
 import UserSessions from "./Components/Sessions/UserSessions";
+import UserInfo from "./Components/UserInfo/UserInfo";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -52,8 +53,9 @@ function App() {
         <Route path="/" element={ <> <NavBar user={user} /> {!user && <Login />} </>}/>
         {/* <Route path="/" element={!user && <Login />} /> */}
         <Route path="/Home" element={<> <NavBar user={user} />{user && <UserHome />} </>} />     
-        <Route path="/AllTherapists" element={ <> <NavBar user={user} /> {<AllTherapists />} </>} />  
-        <Route path="/UserSessions" element={ <> <NavBar user={user} /> {<UserSessions />} </>} />  
+        <Route path="/AllTherapists" element={ <> <NavBar user={user} /> {user && <AllTherapists />} </>} />  
+        <Route path="/UserSessions" element={ <> <NavBar user={user} /> {user && <UserSessions />} </>} />  
+        <Route path="/UserInfo" element={ <> <NavBar user={user} /> {user && <UserInfo user={user} />} </>} />  
         </Routes>
         </BrowserRouter>
       </isTherapistContext.Provider>

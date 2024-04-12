@@ -22,6 +22,9 @@ const NavBar = ({user}) => {
     navigate('/UserSessions');
   }
 
+  const updateprofile = () => {
+    navigate('/UserInfo')
+  }
     return (<>  <Navbar fluid rounded>
         <Navbar.Brand onClick={()=>{navigate('/Home')}}>
           <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">Aaqlak</span>
@@ -38,7 +41,7 @@ const NavBar = ({user}) => {
               <span className="block text-sm">{user.name}</span>
               <span className="block truncate text-sm font-medium">{user.email}</span>
             </Dropdown.Header>
-            <Dropdown.Item>Settings</Dropdown.Item>
+            <Dropdown.Item onClick={updateprofile}>Settings</Dropdown.Item>
             <Dropdown.Item onClick={viewSessions}>Sessions</Dropdown.Item>
             <Dropdown.Divider />
             <Dropdown.Item onClick={logout}>Sign out</Dropdown.Item>

@@ -156,11 +156,13 @@ const updateProfile = asyncHandler(async (req, res) => {
     throw new Error("Therapist not found");
   }
 
-  const { name, qualifications, bio } = req.body;
+  const { name, email, qualifications, bio, availability } = req.body;
   therapist.name = name || therapist.name;
+  therapist.email = email || therapist.email;
   therapist.qualifications = qualifications || therapist.qualifications;
   therapist.bio = bio || therapist.bio;
   therapist.availability = availability || therapist.availability;
+  //therapist.picture = picture || therapist.picture;
 
   const updatedTherapist = await therapist.save();
   res.status(200).json(updatedTherapist);
@@ -206,12 +208,10 @@ const updateAvailability = asyncHandler(async (req, res) => {
   if (!therapist) {
     return res.status(404).json({ message: "Therapist not found" });
   }
-  res
-    .status(200)
-    .json({
-      message: "Availability updated successfully",
-      availability: therapist.availability,
-    });
+  res.status(200).json({
+    message: "Availability updated successfully",
+    availability: therapist.availability,
+  });
 });
 const forgotPassword = asyncHandler(async (req, res) => {
   const { email } = req.body;
@@ -306,12 +306,10 @@ const resetPassword = asyncHandler(async (req, res) => {
   }
   user.password = password;
   await user.save();
-  res
-    .status(200)
-    .json({
-      success: true,
-      message: "Password reset successfully, please login.",
-    });
+  res.status(200).json({
+    success: true,
+    message: "Password reset successfully, please login.",
+  });
 });
 
 // Session Management.
@@ -397,16 +395,25 @@ const deleteSession = asyncHandler(async (req, res) => {
   res.status(200).json({ message: "Session deleted successfully" });
 });
 const getClients = asyncHandler(async (req, res) => {
-  const therapistId = req.entity._id; 
-  const sessions = await Session.find({ therapist: therapistId }).populate('user', 'name email');
+  const therapistId = req.entity._id;
+  const sessions = await Session.find({ therapist: therapistId }).populate(
+    "user",
+    "name email"
+  );
   // Extracting unique clients
-  const clients = sessions.map(session => ({
+  const clients = sessions
+    .map((session) => ({
       clientId: session.user._id,
       name: session.user.name,
-      email: session.user.email
-  })).filter((value, index, self) =>
-      index === self.findIndex((t) => t.clientId.toString() === value.clientId.toString())
-  );
+      email: session.user.email,
+    }))
+    .filter(
+      (value, index, self) =>
+        index ===
+        self.findIndex(
+          (t) => t.clientId.toString() === value.clientId.toString()
+        )
+    );
   res.status(200).json(clients);
 });
 const getClient = asyncHandler(async (req, res) => {
@@ -414,7 +421,7 @@ const getClient = asyncHandler(async (req, res) => {
   const user = await User.findById(id).select("-password");
   if (!user) {
     return res.status(404).json({ message: "Client not found" });
-  } else{
+  } else {
     res.status(200).json(user);
   }
 });
@@ -436,5 +443,5 @@ module.exports = {
   getSession,
   getSessions,
   getClients,
-  getClient
+  getClient,
 };
