@@ -1,4 +1,4 @@
-import { useEffect, useContext } from "react";
+import { useEffect, useContext, useState } from "react";
 import "../../Css/Home/UserHome.css";
 import Accordion from '../Accordion/Accordion'
 import Button from '@mui/material/Button';
@@ -6,11 +6,25 @@ import { getAllTherapists, getLoginStatus,getUser  } from "../../redux/services/
 import UserContext from "../UserContext/UserContext";
 import { useNavigate } from 'react-router-dom'; 
 import isTherapistContext from "../UserContext/IsTherapist";
+import { getClients } from "../../redux/services/bookingService";
 
 const UserHome = () => {
 	const [user, setUser] = useContext(UserContext);
 	const [isTherapist,setIsTherapist] = useContext(isTherapistContext);
+	const [clients, setClients] = useState([]);
 	const navigate = useNavigate();
+
+	useEffect(() => {
+		if (isTherapist) {
+		  getClients().then(data => {
+			console.log(data);
+			setClients(data);
+		  }).catch(error => {
+			console.error('Error fetching clients:', error);
+			setClients([]); // Optionally handle the error by setting an empty array
+		  });
+		}
+	  }, [isTherapist]);
 
     return ( <>
         <div className="home-header">
@@ -24,6 +38,22 @@ const UserHome = () => {
                 </div>
             </div>
         </div>
+		{isTherapist && clients && (
+ 			 <div className="clients-wrapper">
+				<div className="clients-header"> <h3>Patients: </h3> </div>
+    			{clients.map((client, index) => (
+      				<div key={index} className="client-item">
+        				<div className="client-wrapper"> <div className="client-badge"></div> </div>
+        				<div className="client-wrapper">
+          					<div>{client.name}</div>
+          					<div>{client.email}</div>
+        				</div>
+      				</div>
+    			))}
+  			</div>
+		)}
+
+
         <div className="home-body">
             <div className="home-body-wrapper">
                 <div className="home-body-title"> 

@@ -381,7 +381,7 @@ const updateSession = asyncHandler(async (req, res) => {
 });
 const deleteSession = asyncHandler(async (req, res) => {
   const therapistId = req.entity._id;
-  const sessionId = req.params.id;
+  const { sessionId } = req.params;
 
   const session = await Session.findOneAndDelete({
     _id: sessionId,
